@@ -1,5 +1,7 @@
 import Head from 'next/head'
 import { LineChart, Line } from 'recharts';
+import fetch from 'node-fetch'
+
 const data = [
   { name: 'Page A', uv: 400, pv: 2400, amt: 2400 },
   { name: 'Page B', uv: 400, pv: 2400, amt: 2400 },
@@ -20,6 +22,7 @@ export default function Home() {
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"></link>
       </Head>
 
       <main>
@@ -187,4 +190,20 @@ export default function Home() {
       `}</style>
     </div>
   )
+}
+
+export async function getStaticProps(context) {
+  let data = null
+  try {
+    const resp = await fetch('https://pomber.github.io/covid19/timeseries.json')
+    data = await resp.json()
+  } catch (e) {
+    console.error('Failed to fetch data:', e)
+  }
+
+  return {
+    props: {
+      data
+    }, // will be passed to the page component as props
+  }
 }
