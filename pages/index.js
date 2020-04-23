@@ -1,4 +1,5 @@
 import Head from 'next/head'
+import { useState, useEffect } from 'react'
 import { LineChart, Line } from 'recharts';
 import fetch from 'node-fetch'
 
@@ -17,6 +18,9 @@ const renderLineChart = () => (
 );
 
 export default function Home({ data, countries }) {
+
+  const [country, setCountry] = useState('US')
+
   return (
     <div className="container">
       <Head>
@@ -34,10 +38,11 @@ export default function Home({ data, countries }) {
           Written with <code>Next.js</code>
         </p>
         <div className="form-group">
-          <select className="form-control" id="countrySelect">
+          <select className="form-control" id="countrySelect" value={country} onChange={(e) => { setCountry(e.target.value) }}>
             {countries.map((c) => (<option>{c}</option>))}
           </select>
         </div>
+
         {renderLineChart()}
 
       </main>
