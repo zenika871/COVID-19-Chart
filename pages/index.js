@@ -16,11 +16,11 @@ const renderLineChart = () => (
   </LineChart>
 );
 
-export default function Home() {
+export default function Home({ data, countries }) {
   return (
     <div className="container">
       <Head>
-        <title>Create Next App</title>
+        <title>COVID-19 Chart</title>
         <link rel="icon" href="/favicon.ico" />
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"></link>
       </Head>
@@ -33,6 +33,11 @@ export default function Home() {
         <p className="description">
           Written with <code>Next.js</code>
         </p>
+        <div className="form-group">
+          <select className="form-control" id="countrySelect">
+            {countries.map((c) => (<option>{c}</option>))}
+          </select>
+        </div>
         {renderLineChart()}
 
       </main>
@@ -193,17 +198,21 @@ export default function Home() {
 }
 
 export async function getStaticProps(context) {
-  let data = null
+  let data = null, countries = []
   try {
     const resp = await fetch('https://pomber.github.io/covid19/timeseries.json')
     data = await resp.json()
+    if (typeof data === 'object') {
+      countries = Object.keys(data).sort()
+    }
   } catch (e) {
     console.error('Failed to fetch data:', e)
   }
 
   return {
     props: {
-      data
+      data,
+      countries
     }, // will be passed to the page component as props
   }
 }
