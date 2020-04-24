@@ -1,13 +1,32 @@
 import Head from 'next/head'
+import Dynamic from 'next/dynamic'
+
 import { useState, useEffect } from 'react'
-import { LineChart, Line } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 import fetch from 'node-fetch'
 
-const renderLineChart = (data) => (
-  <LineChart width={400} height={400} data={data}>
-    <Line type="monotone" dataKey="uv" stroke="#8884d8" />
+const renderLineChart = (data) => {
+  return <LineChart
+    id="lineChart"
+    width={1000}
+    height={500}
+    data={data}
+    margin={{
+      top: 5, right: 30, left: 20, bottom: 5,
+    }}
+
+  >
+    <CartesianGrid strokeDasharray="3 3" />
+    <XAxis dataKey="date" width={500} />
+    <YAxis />
+    <Tooltip />
+    <Legend />
+    <Line type="monotone" dataKey="confirmed" stroke="#8884d8" activeDot={{ r: 8 }} />
+    <Line type="monotone" dataKey="deaths" stroke="#820000" />
+    <Line type="monotone" dataKey="recovered" stroke="#008200" />
+
   </LineChart>
-);
+};
 
 export default function Home({ data, countries }) {
 
@@ -18,7 +37,7 @@ export default function Home({ data, countries }) {
       <Head>
         <title>COVID-19 Chart</title>
         <link rel="icon" href="/favicon.ico" />
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"></link>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossOrigin="anonymous"></link>
       </Head>
 
       <main>
@@ -31,11 +50,11 @@ export default function Home({ data, countries }) {
         </p>
         <div className="form-group">
           <select className="form-control" id="countrySelect" value={country} onChange={(e) => { setCountry(e.target.value) }}>
-            {countries.map((c) => (<option>{c}</option>))}
+            {countries.map((c) => (<option key={c}>{c}</option>))}
           </select>
         </div>
 
-        {countries ? renderLineChart(countries[country]) : null}
+        {renderLineChart(data[country] || [])}
 
       </main>
 
@@ -195,7 +214,7 @@ export default function Home({ data, countries }) {
 }
 
 export async function getStaticProps(context) {
-  let data = null, countries = []
+  let data = {}, countries = []
   try {
     const resp = await fetch('https://pomber.github.io/covid19/timeseries.json')
     data = await resp.json()
