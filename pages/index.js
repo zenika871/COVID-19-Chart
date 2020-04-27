@@ -1,11 +1,11 @@
 import Head from 'next/head'
-import Dynamic from 'next/dynamic'
+import Dynamic from 'next/dynamic';
 
 import { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 import fetch from 'node-fetch'
 
-const renderLineChart = (data) => {
+const renderLineChart = ({data}) => {
   return <LineChart
     id="lineChart"
     width={1000}
@@ -27,6 +27,11 @@ const renderLineChart = (data) => {
 
   </LineChart>
 };
+
+const DynamicChart = Dynamic(() => renderLineChart, {
+  loading: () => <p>Loading...</p>,
+  ssr: false
+})
 
 export default function Home({ data, countries }) {
 
@@ -53,8 +58,7 @@ export default function Home({ data, countries }) {
             {countries.map((c) => (<option key={c}>{c}</option>))}
           </select>
         </div>
-
-        {renderLineChart(data[country] || [])}
+        <DynamicChart data = {data[country] || []}/>
 
       </main>
 
